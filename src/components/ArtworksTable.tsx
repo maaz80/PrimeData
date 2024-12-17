@@ -7,6 +7,7 @@ import { OverlayPanel } from 'primereact/overlaypanel';
 import { InputNumber } from 'primereact/inputnumber';
 import 'tailwindcss/tailwind.css';
 
+// INterface defining 
 interface Artwork {
   id: number;
   title: string;
@@ -18,6 +19,7 @@ interface Artwork {
 }
 
 const ArtworksTable: React.FC = () => {
+
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -27,6 +29,7 @@ const ArtworksTable: React.FC = () => {
   const [selectNumber, setSelectNumber] = useState<number>(0);
   const overlayPanelRef = useRef<OverlayPanel>(null);
 
+  // Fetching API
   const fetchArtworks = async (page: number) => {
     try {
       setLoading(true);
@@ -44,6 +47,7 @@ const ArtworksTable: React.FC = () => {
         date_start: artwork.date_start,
         date_end: artwork.date_end,
       }));
+      // setting data 
       setTotalRecords(data.pagination.total);
       return fetchedArtworks;
     } catch (error) {
@@ -54,24 +58,29 @@ const ArtworksTable: React.FC = () => {
     }
   };
 
+  // Fetching artworks when page changes
   useEffect(() => {
     fetchArtworks(currentPage).then((data) => {
       setArtworks(data);
     });
   }, [currentPage]);
 
+  // HAndle page change 
   const onPageChange = (event: any) => {
     setCurrentPage(event.page + 1);
   };
- // General type for DataTable selection change
- const onSelectionChange = (e: { value: Artwork[] }) => {
-  setSelectedArtworks(e.value);
-};
 
+  // FUnctpon for selection change in DataTable
+  const onSelectionChange = (e: { value: Artwork[] }) => {
+    setSelectedArtworks(e.value);
+  };
+
+  // Click function overlay panel for selecting row
   const onChevronClick = (event: React.MouseEvent) => {
     overlayPanelRef.current?.toggle(event);
   };
 
+  // Handle full row selection
   const onSubmitNumber = async () => {
     let numberToSelect = selectNumber;
     let newSelectedArtworks: Artwork[] = [...selectedArtworks];
@@ -86,6 +95,7 @@ const ArtworksTable: React.FC = () => {
       currentIndex++;
     }
 
+    // Fetch and select 
     let nextPage = currentPage + 1;
     while (numberToSelect > 0) {
       const additionalArtworks = await fetchArtworks(nextPage);
@@ -110,6 +120,7 @@ const ArtworksTable: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4 text-center md:text-left">PrimeReact Assignment</h1>
       <div className="overflow-x-auto">
+        {/* DataTable */}
         <DataTable
           value={artworks}
           paginator={false}
@@ -169,6 +180,7 @@ const ArtworksTable: React.FC = () => {
           ></Column>
         </DataTable>
       </div>
+      {/* Pagination  */}
       <Paginator
         first={(currentPage - 1) * rowsPerPage}
         rows={rowsPerPage}
@@ -177,6 +189,7 @@ const ArtworksTable: React.FC = () => {
         template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
         className="mt-4"
       />
+      {/* Overlay panel for all data selection */}
       <OverlayPanel ref={overlayPanelRef} style={{ width: '100%', maxWidth: '300px' }}>
         <div className="p-grid p-fluid gap-2">
           <div className="p-col-12">
